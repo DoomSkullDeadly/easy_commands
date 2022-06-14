@@ -1,5 +1,5 @@
-import pygame  # pygame 2.0.0 used here
-from Block import Block
+import pygame  # pygame 2.1.2
+from Blocks import Blocks
 
 pygame.init()
 
@@ -17,10 +17,10 @@ pygame.display.update()
 
 def main():
     running = 1
-    blocks = []
-    blocks.append(Block(pos=[420, 69]))
-    blocks.append(Block(pos=[9, 10]))
-    blocks_to_drag = []  # probably initialise most of these variables in seperate file later on
+    block_controller = Blocks()
+    block_controller.new(pos=[420, 69])  # these are here just to test things
+    block_controller.new(pos=[9, 10])
+
     while running:
         display.fill(colour_black)
         mouse_pos = pygame.mouse.get_pos()
@@ -30,29 +30,24 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:  # breaks loop and quits when esc pressed (useful for fullscreen)
                     running = False
+                if event.key == pygame.K_SPACE:  # make new block at mouse position by pressing space
+                    block_controller.new(pos=mouse_pos)
 
             # Put actual code past here
 
             if event.type == pygame.MOUSEBUTTONDOWN:  # Use this for things that need a mouse up detection
-                for block in blocks:
-                    if block.rect.collidepoint(mouse_pos):  # need to implement layering, only top block can be dragged
-                        block.dragging = True
-                        blocks_to_drag.append(block)
+                block_controller.drag(mouse_pos)
 
             if event.type == pygame.MOUSEBUTTONUP:
-                for block in blocks_to_drag:
-                    block.dragging = False
-                    block.drag_offset = None
-                blocks_to_drag.clear()
+                block_controller.drop()
 
         if pygame.mouse.get_pressed(num_buttons=3)[0]:  # Use this for things that only need to register a click
             pass
 
-        for block in blocks_to_drag:
-            block.drag(pos=mouse_pos)
+        if block_controller.drag_this:
+            block_controller.drag_this.drag(pos=mouse_pos)
 
-        for block in blocks:
-            block.render()
+        block_controller.render()
 
         # no code past here
         clock.tick(60)
