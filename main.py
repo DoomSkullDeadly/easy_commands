@@ -23,7 +23,9 @@ def main():
 
     while running:
         display.fill(colour_black)
-        mouse_pos = pygame.mouse.get_pos()
+        mouse_pos = pygame.mouse.get_pos()  # Some code should go to start of main loop for logic in main loop
+        block_controller.hover_over(mouse_pos)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:  # breaks loop to quit
                 running = False
@@ -36,7 +38,7 @@ def main():
             # Put actual code past here
 
             if event.type == pygame.MOUSEBUTTONDOWN:  # Use this for things that need a mouse up detection
-                block_controller.drag(mouse_pos)
+                block_controller.drag()
 
             if event.type == pygame.MOUSEBUTTONUP:
                 block_controller.drop()

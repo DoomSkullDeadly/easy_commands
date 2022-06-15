@@ -14,10 +14,14 @@ class Block:
         self.clicked = False
         self.rect = pygame.Rect(pos, size)
         self.drag_offset = None
+        self.highlight = False
 
     def render(self):
         pygame.draw.rect(surface=s, color=(100, 130, 60), rect=s.get_rect())  # idk how to not use s.get_rect() :/
-        pygame.draw.rect(surface=s, color=(50, 100, 30), rect=s.get_rect(), width=2)  # outline
+        if self.highlight:
+            pygame.draw.rect(surface=s, color=(150, 255, 90), rect=s.get_rect(), width=2)
+        else:
+            pygame.draw.rect(surface=s, color=(50, 100, 30), rect=s.get_rect(), width=2)  # outline
         display.blit(s, self.rect)
 
     def drag(self, pos=None):

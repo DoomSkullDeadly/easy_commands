@@ -5,7 +5,7 @@ class Blocks:
     def __init__(self):
         self.blocks = []
         self.render_order = []
-        self.to_drag = []
+        self.hovering_over = []
         self.drag_this = None
 
     def render(self):
@@ -25,13 +25,19 @@ class Blocks:
                     self.render_order.insert(num, self.render_order.pop(i))
                     break
 
-    def drag(self, mouse_pos):
+    def hover_over(self, mouse_pos):
+        self.hovering_over.clear()
         for block in self.render_order:
+            block.highlight = False
             if block.rect.collidepoint(mouse_pos):
-                self.to_drag.append(block)
-        if self.to_drag:
-            self.drag_this = self.to_drag[-1]
-            self.to_drag.clear()
+                self.hovering_over.append(block)
+
+        if self.hovering_over:
+            self.hovering_over[-1].highlight = True
+
+    def drag(self):
+        if self.hovering_over:
+            self.drag_this = self.hovering_over[-1]
             self.to_front(self.drag_this.id)
 
     def drop(self):
