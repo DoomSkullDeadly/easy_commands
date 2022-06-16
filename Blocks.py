@@ -43,4 +43,13 @@ class Blocks:
     def drop(self):
         if self.drag_this:
             self.drag_this.drag_offset = None
+            if len(self.hovering_over) >= 2:
+                self.snap(parent=self.hovering_over[-2], child=self.drag_this)
             self.drag_this = None
+
+    def snap(self, parent, child):
+        if parent and child and not parent.child:
+            if child.snap_zone_top.colliderect(parent.snap_zone_bottom):
+                parent.child = child
+                child.parent = parent
+                child.update_pos()
