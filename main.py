@@ -7,12 +7,20 @@ display = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 
 clock = pygame.time.Clock()
 
+font = pygame.font.SysFont("Arial", 18)
+
 colour_white = (255, 255, 255)
 colour_black = (0, 0, 0)
 colour_green = (100, 130, 60)  # idk i randomly made it and thought it looked good for the "correct" colour
 
 display.fill(colour_black)
 pygame.display.update()
+
+
+def update_fps():
+    fps = str(int(clock.get_fps()))
+    fps_text = font.render(fps, True, colour_white)
+    return fps_text
 
 
 def main():
@@ -23,6 +31,7 @@ def main():
 
     while running:
         display.fill(colour_black)
+        display.blit(update_fps(), (3, 3))  # fps counter for debug purposes
         mouse_pos = pygame.mouse.get_pos()  # Some code should go to start of main loop for logic in main loop
         block_controller.hover_over(mouse_pos)
 
