@@ -1,5 +1,10 @@
 from Block import Block
 from itertools import chain
+import pygame
+
+
+pygame.init()
+display = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 
 
 class Blocks:
@@ -9,10 +14,19 @@ class Blocks:
         self.hovering_over = []
         self.drag_this = None
         self.block_chains = {}
+        self.block_chain_outline = None
 
     def render(self):
+        if self.drag_this:  # grr, too many ifs. nOt EfFiCiEnT
+            self.drag_this.highlight = False
+
         for block in self.render_order:
             block.render()
+
+        if self.drag_this:
+            pygame.draw.rect(surface=self.block_chain_outline, color=(255, 255, 255),
+                             rect=self.block_chain_outline.get_rect(), width=2)
+            display.blit(self.block_chain_outline, self.drag_this.rect.topleft)
 
     def new(self, btype=None, pos=[0, 0]):
         new_block = Block(btype=btype, pos=pos)
@@ -27,7 +41,7 @@ class Blocks:
                     self.render_order.insert(num, self.render_order.pop(i))
                     break
 
-    def hover_over(self, mouse_pos):  # TODO: highligh entire chain as one when dragging, but not individual block(s)
+    def hover_over(self, mouse_pos):
         self.hovering_over.clear()
         for block in self.render_order:
             block.highlight = False
@@ -48,6 +62,32 @@ class Blocks:
         # for super_parent in self.block_chains:  # for debug
         #     print(f"{super_parent.id}: {[block.id for block in self.block_chains[super_parent]]}")
         # print("\n")
+
+        self.chain_outline()
+
+    def chain_outline(self):  # will need to redo if different shapes/sizes
+        super_child = self.get_super_child(self.drag_this)
+        size = [super_child.rect.bottomright[0] - self.drag_this.rect.topleft[0],
+                super_child.rect.bottomright[1] - self.drag_this.rect.topleft[1]]
+        self.block_chain_outline = pygame.Surface(size, pygame.SRCALPHA)
+
+    def get_super_parent(self, block):
+        super_parent = block
+        while 1:
+            if super_parent.parent:
+                super_parent = super_parent.parent
+            else:
+                break
+        return super_parent
+
+    def get_super_child(self, block):
+        super_child = block
+        while 1:
+            if super_child.child:
+                super_child = super_child.child
+            else:
+                break
+        return super_child
 
     def drop(self):
         if self.drag_this:
@@ -78,12 +118,7 @@ class Blocks:
             self.block_chains.pop(child)
 
     def chains(self, parent, child):  # I wish I could think of a better way to do this whole part
-        super_parent = parent
-        while 1:  # finds super parent
-            if super_parent.parent:
-                super_parent = super_parent.parent
-            else:
-                break
+        super_parent = self.get_super_parent(parent)
 
         if child and child in self.block_chains:  # removes old chain
             self.block_chains.pop(child)
